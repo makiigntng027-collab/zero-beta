@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE ZERO - Futuristic Interface</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Fonts: Orbitron & Rajdhani -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <script src="tailwind-config.js"></script>
+    <script src="supabase-config.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex flex-col min-h-screen relative selection:bg-neonCyan selection:text-black">
+
+    <!-- Local sign-in gate -->
+    <section id="authScreen" class="auth-screen" aria-label="Login THE ZERO">
+        <div class="auth-glow auth-glow-cyan" aria-hidden="true"></div>
+        <div class="auth-glow auth-glow-purple" aria-hidden="true"></div>
+        <form id="loginForm" class="auth-card">
+            <div class="auth-mark"><img src="logo.png" alt="Logo THE ZERO"></div>
+            <p class="auth-eyebrow">SECURE ACCESS // THE ZERO</p>
+            <h1 id="authTitle" class="auth-title">Selamat Datang</h1>
+            <p id="authDescription" class="auth-description">Masuk menggunakan username dan password Anda.</p>
+            <label class="auth-label" for="authUsername">USERNAME</label>
+            <div class="auth-input-wrap"><i class="fa-solid fa-user"></i><input id="authUsername" type="text" autocomplete="username" placeholder="Masukkan username" required maxlength="32"></div>
+            <label class="auth-label" for="authPassword">PASSWORD</label>
+            <div class="auth-input-wrap"><i class="fa-solid fa-lock"></i><input id="authPassword" type="password" autocomplete="current-password" placeholder="Masukkan password" required minlength="8"></div>
+            <div id="confirmPasswordWrap" class="auth-confirm hidden">
+                <label class="auth-label" for="authPasswordConfirm">ULANGI PASSWORD</label>
+                <div class="auth-input-wrap"><i class="fa-solid fa-shield-halved"></i><input id="authPasswordConfirm" type="password" autocomplete="new-password" placeholder="Ulangi password" minlength="8"></div>
+            </div>
+            <p id="authMessage" class="auth-message" aria-live="polite"></p>
+            <button id="authSubmit" type="submit" class="auth-submit"><span>MASUK</span><i class="fa-solid fa-arrow-right"></i></button>
+            <p id="authHint" class="auth-hint">Akun admin pertama dibuat saat penyiapan awal.</p>
+        </form>
+    </section>
+
+    <!-- Background Layers -->
+    <div class="sky-bg"></div>
+    <div class="moon-glow"></div>
+    <div class="clouds-overlay"></div>
+    <div class="hud-grid"></div>
+    <canvas id="starsCanvas"></canvas>
+
+    <!-- Header Navigation Bar -->
+    <header class="p-4 lg:p-6 w-full max-w-7xl mx-auto z-20">
+        <div class="glass-panel rounded-2xl px-4 py-3 flex items-center justify-between border border-cyan-500/30">
+            
+            <!-- Left Side: Menu + Logo + Title -->
+            <div class="flex items-center space-x-3 sm:space-x-4">
+                <button id="menuBtn" class="w-10 h-10 rounded-xl bg-cyan-950/60 border border-cyan-400/40 flex items-center justify-center text-cyan-300 hover:text-white hover:border-cyan-300 transition-all">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+
+                <div class="flex items-center space-x-2">
+                    <img src="logo.png" alt="Logo THE ZERO" class="brand-logo">
+                    <span class="font-orbitron font-bold text-lg sm:text-xl tracking-wider text-cyan-300 shadow-cyan-500/50">
+                        THE ZERO
+                    </span>
+                </div>
+            </div>
+
+            <!-- Center Title: WELCOME -->
+            <div class="hidden md:block">
+                <h2 class="font-orbitron text-xl lg:text-2xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-200 to-purple-400 drop-shadow-[0_0_10px_rgba(0,242,254,0.5)]">
+                    WELCOME
+                </h2>
+            </div>
+
+            <!-- Right Side: Profile Widget -->
+            <div class="flex items-center space-x-3">
+                <button id="adminPanelBtn" type="button" title="Admin Panel" aria-label="Admin Panel" class="hidden w-9 h-9 rounded-xl border border-blue-400/50 bg-blue-950/50 text-blue-300 items-center justify-center hover:bg-blue-900/60 hover:text-blue-100 transition-all">
+                    <i class="fa-solid fa-user-shield"></i>
+                </button>
+                <div class="flex items-center bg-cyan-950/40 border border-cyan-500/40 rounded-full py-1 px-2 sm:px-3 space-x-2">
+                    <img id="headerAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" 
+                         alt="MAKII Avatar" 
+                         class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover border border-cyan-300"
+                         data-fallback="https://placehold.co/100x100/0f172a/00f2fe?text=User">
+                    <div class="flex flex-col text-left">
+                        <span id="headerUsername" class="font-orbitron text-xs sm:text-sm font-bold tracking-wide text-white leading-tight">MAKII</span>
+                        <span id="headerRole" class="text-[9px] font-orbitron bg-cyan-500/20 text-cyan-300 px-1.5 py-0.2 rounded tracking-wider uppercase border border-cyan-400/30">ADMIN</span>
+                    </div>
+                </div>
+
+                <button type="button" data-open-modal="switchAccountModal" title="Ganti akun" aria-label="Ganti akun" class="w-9 h-9 rounded-xl bg-cyan-950/40 border border-cyan-500/40 text-cyan-300 flex items-center justify-center hover:bg-cyan-900/50 hover:text-white transition-all">
+                    <i class="fa-solid fa-users-gear"></i>
+                </button>
+                <button id="logoutBtn" title="Keluar" aria-label="Keluar" class="w-9 h-9 rounded-xl bg-red-950/40 border border-red-500/40 text-red-400 flex items-center justify-center hover:bg-red-900/50 hover:text-white transition-all">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row items-center justify-between gap-10 z-10">
+        
+        <!-- Left Hero Section -->
+        <div class="flex-1 flex flex-col items-start text-left space-y-6 w-full">
+            
+            <!-- Top Small Tag -->
+            <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-cyan-950/50 border border-cyan-400/40 shadow-[0_0_15px_rgba(0,242,254,0.2)]">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <span class="font-orbitron text-xs text-cyan-300 tracking-wider">WELCOME TO THE ZERO WEBSITE</span>
+            </div>
+
+            <!-- Big Main Title -->
+            <div class="space-y-1">
+                <h1 class="font-orbitron font-black text-4xl sm:text-6xl lg:text-7xl tracking-wide text-white leading-none drop-shadow-md">
+                    WELCOME TO
+                </h1>
+                <h1 class="font-orbitron font-black text-5xl sm:text-7xl lg:text-8xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-cyan-400 to-purple-400 leading-tight drop-shadow-[0_0_35px_rgba(0,242,254,0.5)]">
+                    THE ZERO
+                </h1>
+            </div>
+
+            <!-- Subtitle -->
+            <p class="font-rajdhani text-lg sm:text-xl text-cyan-100/80 font-medium tracking-wide flex items-center space-x-2">
+                <span>Makki Develooper</span>
+                <span class="text-cyan-400 text-sm">✦ ˚</span>
+            </p>
+
+        </div>
+
+        <!-- Right Profile Card Section -->
+        <div class="w-full sm:w-80 lg:w-96 flex-shrink-0 flex justify-center lg:justify-end">
+            <div class="glass-card rounded-3xl p-4 w-full max-w-sm flex flex-col space-y-4 relative group">
+                
+                <!-- Glowing Frame/Photo Area -->
+                <div class="relative w-full rounded-2xl overflow-hidden border border-cyan-400/30 shadow-inner">
+                    <button id="profilePhotoOpen" type="button" class="profile-view-button block w-full" aria-label="Lihat foto profil layar penuh">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"
+                             alt="Foto profil THE ZERO"
+                             class="account-profile-photo block w-full h-[23rem] object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                             data-default-src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"
+                             data-fallback="https://placehold.co/400x700/1e293b/00f2fe?text=Profile+Image">
+                    </button>
+                </div>
+
+                <!-- Footer details of Card -->
+                <div class="flex items-center justify-between pt-1 px-1">
+                    <div class="flex flex-col">
+                        <span class="font-orbitron text-lg font-bold tracking-wider text-white">THE ZERO</span>
+                        <div class="flex items-center space-x-2 mt-0.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></span>
+                            <span class="text-xs font-rajdhani font-semibold text-emerald-400 tracking-wide">Status: online</span>
+                        </div>
+                    </div>
+
+                    <!-- Version Badge -->
+                    <div class="px-3 py-1 rounded-xl bg-purple-950/60 border border-purple-500/40 text-purple-300 font-orbitron text-xs font-semibold tracking-widest shadow-[0_0_10px_rgba(157,78,221,0.2)]">
+                        v1.0
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Fullscreen profile photo viewer -->
+    <div id="profilePhotoViewer" class="profile-photo-viewer hidden" role="dialog" aria-modal="true" aria-label="Foto profil layar penuh">
+        <button id="profilePhotoClose" type="button" class="profile-photo-close" aria-label="Tutup foto"><i class="fa-solid fa-xmark"></i></button>
+        <img id="profilePhotoFull" class="profile-photo-full" alt="Foto profil THE ZERO layar penuh">
+    </div>
+
+    <!-- Side Navigation Drawer (Hidden by default) -->
+    <div id="drawer" class="fixed inset-y-0 left-0 w-72 bg-slate-950/95 border-r border-cyan-500/30 z-50 transform -translate-x-full transition-transform duration-300 backdrop-blur-xl p-6 flex flex-col justify-between">
+        <div class="drawer-content">
+            <div class="flex items-center justify-between border-b border-cyan-500/20 pb-4">
+                <span class="font-orbitron text-lg font-bold text-cyan-300">NAVIGATION</span>
+                <button id="closeDrawerBtn" class="text-cyan-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <section class="theme-picker layout-picker" aria-labelledby="layoutPickerTitle">
+                <h2 id="layoutPickerTitle" class="theme-picker-title"><i class="fa-solid fa-mobile-screen-button"></i> MODE TAMPILAN</h2>
+                <div class="layout-options" role="group" aria-label="Pilih mode tampilan website">
+                    <button type="button" class="layout-option" data-layout-choice="landscape" aria-pressed="false"><i class="fa-solid fa-tablet-screen-button"></i> Landscape</button>
+                    <button type="button" class="layout-option" data-layout-choice="portrait" aria-pressed="false"><i class="fa-solid fa-mobile-screen-button"></i> Portrait</button>
+                </div>
+            </section>
+            <nav class="mt-6 flex flex-col space-y-3 font-orbitron text-sm">
+                <a href="#" class="px-4 py-2.5 rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 flex items-center space-x-3"><i class="fa-solid fa-house"></i><span>Home</span></a>
+                <a href="#" data-open-modal="globalChatModal" class="px-4 py-2.5 rounded-xl text-slate-300 hover:bg-cyan-500/10 hover:text-cyan-300 transition-colors flex items-center space-x-3"><i class="fa-solid fa-comments"></i><span>Global Chat</span></a>
+                <a href="#" data-open-modal="privateMessagesModal" class="px-4 py-2.5 rounded-xl text-slate-300 hover:bg-cyan-500/10 hover:text-cyan-300 transition-colors flex items-center space-x-3"><i class="fa-solid fa-envelope"></i><span>Pesan Pribadi</span></a>
+                <a href="#" data-open-modal="musicModal" class="px-4 py-2.5 rounded-xl text-slate-300 hover:bg-cyan-500/10 hover:text-cyan-300 transition-colors flex items-center space-x-3"><i class="fa-solid fa-music"></i><span>Music</span></a>
+                <a href="#" data-open-modal="jumbleModal" class="px-4 py-2.5 rounded-xl text-slate-300 hover:bg-cyan-500/10 hover:text-cyan-300 transition-colors flex items-center space-x-3"><i class="fa-solid fa-shuffle"></i><span>Mini Game</span><span class="ml-auto text-[9px] text-cyan-400">18</span></a>
+                <button id="profileSettingsBtn" type="button" class="px-4 py-2.5 rounded-xl text-slate-300 hover:bg-cyan-500/10 hover:text-cyan-300 transition-colors flex items-center space-x-3 text-left"><i class="fa-solid fa-user-gear"></i><span>Pengaturan Profil</span></button>
+                <button id="changePasswordBtn" type="button" class="px-4 py-2.5 rounded-xl text-slate-300 hover:bg-cyan-500/10 hover:text-cyan-300 transition-colors flex items-center space-x-3 text-left"><i class="fa-solid fa-key"></i><span>Ubah Password</span></button>
+            </nav>
+            <section class="theme-picker" aria-labelledby="themePickerTitle">
+                <h2 id="themePickerTitle" class="theme-picker-title"><i class="fa-solid fa-palette"></i> WARNA WEBSITE</h2>
+                <div class="theme-options" role="group" aria-label="Pilih warna website">
+                    <button type="button" class="theme-option" data-theme-choice="cyan" aria-label="Warna cyan" title="Cyan"><span class="theme-swatch theme-swatch-cyan"></span></button>
+                    <button type="button" class="theme-option" data-theme-choice="purple" aria-label="Warna ungu" title="Ungu"><span class="theme-swatch theme-swatch-purple"></span></button>
+                    <button type="button" class="theme-option" data-theme-choice="green" aria-label="Warna hijau" title="Hijau"><span class="theme-swatch theme-swatch-green"></span></button>
+                    <button type="button" class="theme-option" data-theme-choice="pink" aria-label="Warna pink" title="Pink"><span class="theme-swatch theme-swatch-pink"></span></button>
+                    <button type="button" class="theme-option theme-option-rainbow" data-theme-choice="rainbow" aria-label="Warna RGB" title="RGB"><span class="theme-swatch theme-swatch-rainbow"><i class="fa-solid fa-rainbow"></i></span><span class="theme-option-label">RGB</span></button>
+                </div>
+            </section>
+        </div>
+        <div class="text-xs font-orbitron text-cyan-500/60 text-center border-t border-cyan-500/20 pt-4">
+            THE ZERO ENGINE v1.0
+        </div>
+    </div>
+
+    <!-- Local music player -->
+    <div id="musicModal" class="account-modal fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden items-center justify-center p-4">
+        <section class="account-modal-card glass-panel rounded-3xl border border-cyan-400/50 w-full max-w-lg p-5 sm:p-6 relative">
+            <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3 mb-4">
+                <div><h3 class="font-orbitron text-lg font-bold text-cyan-300"><i class="fa-solid fa-music mr-2"></i>MUSIC PLAYER</h3><p class="text-xs text-slate-400 mt-1">Playlist musik THE ZERO</p></div>
+                <button type="button" data-close-modal="musicModal" aria-label="Tutup" class="text-cyan-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <input id="musicFilesInput" type="file" accept="audio/*" multiple class="hidden">
+            <button id="musicAddButton" type="button" class="music-add-button"><i class="fa-solid fa-folder-plus"></i> Tambah Musik dari Perangkat</button>
+            <div class="music-now-playing"><i class="fa-solid fa-compact-disc music-disc"></i><div class="music-now-playing-info"><span class="music-label">SEDANG DIPUTAR</span><p id="musicTrackName">Belum ada musik dipilih</p></div><div class="music-visualizer" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+            <audio id="musicAudio" preload="metadata"></audio>
+            <div class="music-controls">
+                <button id="musicPrevious" type="button" aria-label="Lagu sebelumnya" title="Sebelumnya"><i class="fa-solid fa-backward-step"></i></button>
+                <button id="musicPlayPause" type="button" class="music-play-button" aria-label="Putar musik" title="Putar"><i class="fa-solid fa-play"></i></button>
+                <button id="musicNext" type="button" aria-label="Lagu berikutnya" title="Berikutnya"><i class="fa-solid fa-forward-step"></i></button>
+                <label class="music-volume" for="musicVolume"><i class="fa-solid fa-volume-high"></i><input id="musicVolume" type="range" min="0" max="1" step="0.01" value="0.7" aria-label="Volume musik"></label>
+            </div>
+            <p id="musicStatus" class="text-xs text-slate-400 mt-2" aria-live="polite">Pilih lagu dari playlist untuk mulai memutar.</p>
+            <ol id="musicPlaylist" class="music-playlist" aria-label="Daftar putar"></ol>
+        </section>
+    </div>
+
+    <!-- Mini game: 18 Indonesian word jumble levels -->
+    <div id="jumbleModal" class="account-modal fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden items-center justify-center p-4">
+        <section class="account-modal-card glass-panel rounded-3xl border border-cyan-400/50 w-full max-w-xl p-5 sm:p-6 relative">
+            <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3 mb-4">
+                <div><h3 class="font-orbitron text-lg font-bold text-cyan-300"><i class="fa-solid fa-shuffle mr-2"></i>JUMBLE GAME</h3><p class="text-xs text-slate-400 mt-1">Susun huruf menjadi kata yang benar</p></div>
+                <button type="button" data-close-modal="jumbleModal" aria-label="Tutup" class="text-cyan-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex items-center justify-between text-xs font-orbitron text-slate-300 mb-3"><span id="jumbleLevel">LEVEL 1 / 18</span><span id="jumbleScore">0 / 18 SELESAI</span></div>
+            <div class="jumble-progress"><span id="jumbleProgressBar"></span></div>
+            <div class="jumble-card">
+                <p class="text-[10px] font-orbitron tracking-widest text-cyan-400">KATA ACAK</p>
+                <p id="jumbleLetters" class="jumble-letters" aria-live="polite"></p>
+                <p id="jumbleHint" class="text-sm text-slate-400"></p>
+            </div>
+            <form id="jumbleForm" class="jumble-form"><input id="jumbleAnswer" type="text" autocomplete="off" placeholder="Ketik jawaban..." aria-label="Jawaban" required><button type="submit" class="neon-button rounded-xl px-5 py-3 text-cyan-300 font-orbitron text-xs">CEK</button></form>
+            <p id="jumbleMessage" class="account-message" aria-live="polite"></p>
+            <div class="flex items-center justify-between gap-3 mt-3"><button id="jumbleHintBtn" type="button" class="profile-action profile-action-muted"><i class="fa-regular fa-lightbulb"></i> Lihat petunjuk</button><button id="jumbleNextBtn" type="button" class="profile-action hidden"><span>LEVEL BERIKUTNYA</span><i class="fa-solid fa-arrow-right"></i></button><button id="jumbleRestartBtn" type="button" class="profile-action hidden"><i class="fa-solid fa-rotate-right"></i> Main lagi</button></div>
+        </section>
+    </div>
+
+    <!-- Status media shared between signed-in accounts -->
+    <section id="mediaStatuses" class="gallery-section max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-8 z-10">
+        <div class="glass-panel rounded-3xl border border-purple-400/40 p-5 sm:p-6">
+            <div class="border-b border-purple-500/30 pb-3 mb-4">
+                <h3 class="font-orbitron text-xl font-bold text-purple-300 flex items-center gap-2"><i class="fa-solid fa-circle-play"></i> STATUS MEDIA</h3>
+                <p class="text-xs text-slate-400 mt-1">Bagikan foto atau video agar terlihat oleh semua akun dari perangkat lain.</p>
+            </div>
+            <form id="statusUploadForm" class="mb-4 rounded-xl border border-purple-500/30 bg-purple-950/20 p-4">
+                <label class="auth-label !mt-0" for="statusMediaInput">UNGGAH STATUS</label>
+                <input id="statusMediaInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/avif,video/mp4,video/webm,video/quicktime" class="block w-full text-sm text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-purple-500/20 file:px-3 file:py-2 file:text-purple-200">
+                <label class="auth-label" for="statusCaptionInput">CAPTION (OPSIONAL)</label>
+                <textarea id="statusCaptionInput" maxlength="500" rows="2" placeholder="Tulis caption status..." class="mt-2 block w-full rounded-xl border border-cyan-500/30 bg-slate-950/70 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"></textarea>
+                <p class="text-xs text-slate-400 mt-2">Maksimal 50 MB. Anda dapat menghapus status kapan saja.</p>
+                <button type="submit" class="auth-submit"><span>BAGIKAN STATUS</span><i class="fa-solid fa-cloud-arrow-up"></i></button>
+                <p id="statusUploadMessage" class="account-message" aria-live="polite"></p>
+            </form>
+            <p id="mediaStatusRead" class="text-sm text-slate-400 mb-3" aria-live="polite"></p>
+            <div id="mediaStatusGrid" class="gallery-grid"></div>
+        </div>
+    </section>
+
+    <!-- Galeri Media on the home page -->
+    <section id="mediaGallery" class="gallery-section max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-12 z-10">
+        <div class="glass-panel rounded-3xl border border-cyan-400/50 p-5 sm:p-6">
+            <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3 mb-4">
+                <h3 class="font-orbitron text-xl font-bold text-cyan-300 flex items-center gap-2"><i class="fa-solid fa-photo-film"></i> GALERI MEDIA</h3>
+            </div>
+            <form id="galleryUploadForm" class="hidden mb-4 rounded-xl border border-cyan-500/30 bg-cyan-950/20 p-4">
+                <label class="auth-label !mt-0" for="galleryMediaInput">TAMBAH FOTO ATAU VIDEO</label>
+                <input id="galleryMediaInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/avif,video/mp4,video/webm,video/quicktime" multiple class="block w-full text-sm text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-cyan-500/20 file:px-3 file:py-2 file:text-cyan-200">
+                <p class="text-xs text-slate-400 mt-2">Maksimal 50 MB per file. Media tersimpan bersama dan dapat dilihat akun lain.</p>
+                <button type="submit" class="auth-submit"><span>UNGGAH MEDIA</span><i class="fa-solid fa-cloud-arrow-up"></i></button>
+                <p id="galleryStatus" class="account-message" aria-live="polite"></p>
+            </form>
+            <p id="galleryStatusRead" class="text-sm text-slate-400 mb-3" aria-live="polite"></p>
+            <div id="galleryGrid" class="gallery-grid"></div>
+        </div>
+    </section>
+
+    <!-- Global chat -->
+    <div id="globalChatModal" class="account-modal fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden items-center justify-center p-4">
+        <section class="account-modal-card glass-panel rounded-3xl border border-cyan-400/50 w-full max-w-2xl p-5 sm:p-6 relative flex flex-col">
+            <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3 mb-4">
+                <div>
+                    <h3 class="font-orbitron text-lg font-bold text-cyan-300"><i class="fa-solid fa-comments mr-2"></i>GLOBAL CHAT</h3>
+                    <p class="text-xs text-slate-400 mt-1">Chat bersama akun admin dan pengguna</p>
+                </div>
+                <button type="button" data-close-modal="globalChatModal" aria-label="Tutup" class="text-cyan-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p id="globalChatStatus" class="text-sm text-slate-400 mb-3" aria-live="polite"></p>
+            <div id="globalChatMessages" class="global-chat-messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+            <form id="globalChatForm" class="global-chat-form mt-4">
+                <textarea id="globalChatInput" rows="2" maxlength="1000" placeholder="Tulis pesan..." aria-label="Pesan chat" required></textarea>
+                <button type="submit" class="neon-button rounded-xl px-5 py-3 text-cyan-300" aria-label="Kirim pesan"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </section>
+    </div>
+
+    <!-- Private messages -->
+    <div id="privateMessagesModal" class="account-modal fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden items-center justify-center p-4">
+        <section class="account-modal-card glass-panel rounded-3xl border border-cyan-400/50 w-full max-w-4xl p-5 sm:p-6 relative flex flex-col">
+            <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3 mb-4">
+                <div><h3 class="font-orbitron text-lg font-bold text-cyan-300"><i class="fa-solid fa-envelope mr-2"></i>PESAN PRIBADI</h3><p class="text-xs text-slate-400 mt-1">Percakapan hanya terlihat oleh kamu dan penerima</p></div>
+                <button type="button" data-close-modal="privateMessagesModal" aria-label="Tutup" class="text-cyan-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p id="privateMessageStatus" class="text-sm text-slate-400 mb-3" aria-live="polite"></p>
+            <div class="private-chat-layout">
+                <aside class="private-contact-panel">
+                    <h4 class="private-panel-heading">PILIH AKUN</h4>
+                    <div id="privateContacts" class="private-contacts" aria-label="Daftar akun"></div>
+                </aside>
+                <section class="private-conversation">
+                    <div id="privateConversationTitle" class="private-conversation-title">Pilih akun untuk memulai chat</div>
+                    <div id="privateMessagesList" class="private-messages-list" role="log" aria-live="polite" aria-relevant="additions"></div>
+                    <form id="privateMessageForm" class="global-chat-form private-message-form">
+                        <textarea id="privateMessageInput" rows="2" maxlength="1000" placeholder="Tulis pesan pribadi..." aria-label="Pesan pribadi" required disabled></textarea>
+                        <button type="submit" class="neon-button rounded-xl px-5 py-3 text-cyan-300" aria-label="Kirim pesan pribadi" disabled><i class="fa-solid fa-paper-plane"></i></button>
+                    </form>
+                </section>
+            </div>
+        </section>
+    </div>
+
+    <!-- Hubungi Saya on the home page -->
+    <section id="contactSection" class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-12 z-10">
+        <div class="glass-panel rounded-3xl border border-cyan-400/50 w-full max-w-3xl mx-auto p-5 sm:p-6">
+            <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3 mb-4">
+                <h3 class="font-orbitron text-xl font-bold text-cyan-300 flex items-center gap-2"><i class="fa-solid fa-paper-plane"></i> HUBUNGI SAYA</h3>
+            </div>
+            <form id="contactForm" class="space-y-4">
+                <div>
+                    <label class="block font-orbitron text-xs text-cyan-300 mb-1">NAMA</label>
+                    <input type="text" required class="w-full bg-slate-900/80 border border-cyan-500/40 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-cyan-400" placeholder="Masukkan nama...">
+                </div>
+                <div>
+                    <label class="block font-orbitron text-xs text-cyan-300 mb-1">PESAN</label>
+                    <textarea rows="3" required class="w-full bg-slate-900/80 border border-cyan-500/40 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-cyan-400" placeholder="Tuliskan pesan Anda..."></textarea>
+                </div>
+                <button type="submit" class="w-full neon-button py-2.5 rounded-xl font-orbitron text-cyan-300 font-bold hover:text-white transition-all">KIRIM PESAN</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Profile Settings -->
+    <div id="profileModal" class="account-modal fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden items-center justify-center p-4">
+        <form id="profileForm" class="account-modal-card glass-panel rounded-3xl border border-cyan-400/50 w-full max-w-md p-6 relative">
+            <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3 mb-5">
+                <h3 class="font-orbitron text-lg font-bold text-cyan-300"><i class="fa-solid fa-user-gear mr-2"></i>PENGATURAN PROFIL</h3>
+                <button type="button" data-close-modal="profileModal" aria-label="Tutup" class="text-cyan-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex flex-col items-center mb-5">
+                <img id="profilePhotoPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="Pratinjau foto profil" class="profile-photo-preview">
+                <div class="flex gap-2 mt-4">
+                    <label for="profilePhotoInput" class="profile-action"><i class="fa-solid fa-image"></i> Pilih Foto</label>
+                    <button id="removeProfilePhotoBtn" type="button" class="profile-action profile-action-muted"><i class="fa-solid fa-trash"></i> Hapus</button>
+                </div>
+                <input id="profilePhotoInput" type="file" accept="image/*" class="hidden">
+                <p class="profile-help">Pilih foto JPG, PNG, atau WebP dari perangkat Anda.</p>
+            </div>
+            <label for="profileUsernameInput" class="auth-label">USERNAME</label>
+            <div class="auth-input-wrap"><i class="fa-solid fa-user"></i><input id="profileUsernameInput" type="text" maxlength="32" required></div>
+            <p id="profileMessage" class="account-message" aria-live="polite"></p>
+            <div class="flex gap-3 mt-3">
+                <button type="button" data-close-modal="profileModal" class="profile-action profile-action-muted flex-1 justify-center">Batal</button>
+                <button type="submit" class="auth-submit flex-1 mt-0"><span>SIMPAN</span><i class="fa-solid fa-check"></i></button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Change Password -->
+    <div id="passwordModal" class="account-modal fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden items-center justify-center p-4">
+        <form id="passwordForm" class="account-modal-card glass-panel rounded-3xl border border-cyan-400/50 w-full max-w-md p-6 relative">
+            <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3 mb-5">
+                <h3 class="font-orbitron text-lg font-bold text-cyan-300"><i class="fa-solid fa-key mr-2"></i>UBAH PASSWORD</h3>
+                <button type="button" data-close-modal="passwordModal" aria-label="Tutup" class="text-cyan-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <label for="currentPasswordInput" class="auth-label">PASSWORD SAAT INI</label>
+            <div class="auth-input-wrap"><i class="fa-solid fa-lock"></i><input id="currentPasswordInput" type="password" autocomplete="current-password" required></div>
+            <label for="newPasswordInput" class="auth-label">PASSWORD BARU</label>
+            <div class="auth-input-wrap"><i class="fa-solid fa-shield-halved"></i><input id="newPasswordInput" type="password" autocomplete="new-password" minlength="8" required></div>
+            <label for="confirmNewPasswordInput" class="auth-label">ULANGI PASSWORD BARU</label>
+            <div class="auth-input-wrap"><i class="fa-solid fa-check"></i><input id="confirmNewPasswordInput" type="password" autocomplete="new-password" minlength="8" required></div>
+            <p id="passwordMessage" class="account-message" aria-live="polite"></p>
+            <div class="flex gap-3 mt-3">
+                <button type="button" data-close-modal="passwordModal" class="profile-action profile-action-muted flex-1 justify-center">Batal</button>
+                <button type="submit" class="auth-submit flex-1 mt-0"><span>UBAH PASSWORD</span><i class="fa-solid fa-check"></i></button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Switch Account -->
+    <div id="switchAccountModal" class="account-modal fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden items-center justify-center p-4">
+        <form id="switchAccountForm" class="account-modal-card glass-panel rounded-3xl border border-cyan-400/50 w-full max-w-md p-6 relative">
+            <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3 mb-5">
+                <h3 class="font-orbitron text-lg font-bold text-cyan-300"><i class="fa-solid fa-users-gear mr-2"></i>GANTI AKUN</h3>
+                <button type="button" data-close-modal="switchAccountModal" aria-label="Tutup" class="text-cyan-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="profile-help text-left !mt-0">Masuk ke akun lain tanpa keluar dari halaman ini.</p>
+            <label for="switchUsernameInput" class="auth-label">USERNAME AKUN TUJUAN</label>
+            <div class="auth-input-wrap"><i class="fa-solid fa-user"></i><input id="switchUsernameInput" type="text" maxlength="32" autocomplete="username" required></div>
+            <label for="switchPasswordInput" class="auth-label">PASSWORD</label>
+            <div class="auth-input-wrap"><i class="fa-solid fa-lock"></i><input id="switchPasswordInput" type="password" autocomplete="current-password" required></div>
+            <p id="switchAccountMessage" class="account-message" aria-live="polite"></p>
+            <button type="submit" class="auth-submit mt-2"><span>GANTI AKUN</span><i class="fa-solid fa-arrow-right"></i></button>
+        </form>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanelModal" class="account-modal fixed inset-0 bg-black/80 backdrop-blur-md z-[60] hidden items-center justify-center p-4">
+        <section class="account-modal-card admin-panel-card glass-panel rounded-2xl border border-cyan-400/50 w-full max-w-md p-4 sm:p-5 relative">
+            <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3 mb-4">
+                <h3 class="font-orbitron text-lg font-bold text-cyan-300"><i class="fa-solid fa-user-shield mr-2"></i>ADMIN PANEL</h3>
+                <button type="button" data-close-modal="adminPanelModal" aria-label="Tutup" class="text-cyan-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-sm text-slate-400 mb-4">Kelola akun dan akses pengguna.</p>
+            <div class="admin-import-row">
+                <span><i class="fa-solid fa-cloud-arrow-up mr-2 text-cyan-300"></i>Impor akun dari browser ini</span>
+                <button id="importLegacyAccountsBtn" type="button" class="admin-quiet-button">Impor</button>
+                <p id="importLegacyAccountsMessage" class="account-message" aria-live="polite"></p>
+            </div>
+            <form id="createUserForm" class="admin-create-form">
+                <label class="auth-label !mt-0" for="newUsernameInput">USERNAME AKUN</label>
+                <div class="auth-input-wrap"><i class="fa-solid fa-user"></i><input id="newUsernameInput" type="text" maxlength="32" minlength="3" placeholder="Username baru" required></div>
+                <label class="auth-label" for="newUserPasswordInput">PASSWORD</label>
+                <div class="auth-input-wrap"><i class="fa-solid fa-lock"></i><input id="newUserPasswordInput" type="password" minlength="8" placeholder="Minimal 8 karakter" required></div>
+                <label class="auth-label" for="newUserPasswordConfirmInput">ULANGI PASSWORD</label>
+                <div class="auth-input-wrap"><i class="fa-solid fa-shield-halved"></i><input id="newUserPasswordConfirmInput" type="password" minlength="8" placeholder="Ulangi password" required></div>
+                <p id="createUserMessage" class="account-message" aria-live="polite"></p>
+                <div class="grid grid-cols-2 gap-2 mt-1">
+                    <button type="submit" data-account-role="user" class="admin-create-button"><i class="fa-solid fa-user-plus"></i> Buat User</button>
+                    <button type="submit" data-account-role="admin" class="admin-create-button"><i class="fa-solid fa-user-shield"></i> Buat Admin</button>
+                </div>
+            </form>
+            <div class="mt-4 border-t border-cyan-500/20 pt-3">
+                <h4 class="font-orbitron text-xs font-bold tracking-wider text-slate-200">AKUN TERDAFTAR</h4>
+                <ul id="adminUsersList" class="mt-3 space-y-2"></ul>
+                <p id="adminAccountActionMessage" class="account-message" aria-live="polite"></p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 glass-panel border border-cyan-400 text-cyan-300 px-5 py-3 rounded-2xl font-orbitron text-sm hidden z-50 shadow-[0_0_20px_rgba(0,242,254,0.4)]">
+        Pesan berhasil terkirim!
+    </div>
+
+    <!-- Interactive Script -->
+    <script src="script.js"></script>
+</body>
+</html>
